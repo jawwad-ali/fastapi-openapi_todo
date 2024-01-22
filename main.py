@@ -54,6 +54,9 @@ def get_todo(db = Depends(get_db) , user: UserModel = Depends(get_current_user))
 
 
 
+
+
+
 # Get todo which are completed(is_done = True)
 # Updated Todo
 @app.put("/update/{id}")
@@ -132,7 +135,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends() , db = Depends(get_db
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect username or password"
-        )
+        ) 
 
     if not verify_password(form_data.password, user.password):
         raise HTTPException(
