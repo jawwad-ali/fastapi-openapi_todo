@@ -86,7 +86,7 @@ async def update_todo(
 
 
 # Delete Todo
-@app.delete("/delete/{id}")
+@app.delete("/delete/{id}") 
 async def delete_todo(id:int , db = Depends(get_db), user: UserModel = Depends(get_current_user)):
 
     todo_query = db.query(Todo).filter(Todo.user_email == user.email , Todo.id == id).first()

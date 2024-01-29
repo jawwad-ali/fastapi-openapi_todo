@@ -13,7 +13,7 @@ valid_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDU5NDIxMjcsInN1
 # test to add a todo
 def test_add_todo( response = Depends(get_db) ): 
     response = client.post("/create/", json={"title": "test todo" , "description": "test description"},headers={
-        "Authorization": f"Bearer {valid_token}"
+        "Authorization": f"Bearer {valid_token}" 
     })
     assert response.status_code == 200 
     assert response.json()["title"] == "test todo"  
