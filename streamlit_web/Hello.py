@@ -34,6 +34,36 @@ if 'df' not in st.session_state:
 
 placeholder = st.empty()  # Create an empty placeholder for the table
 
+column_styles = """
+<style>
+    .column-style {
+        background-color: purple;  
+        padding: 15px;
+        color:white;
+        border-radius: 10px;
+        margin: 10px;
+    }
+
+    .tabledata{
+        background-color: black;
+        color:white;
+        padding:15px;
+        margin:15px;
+        border-radius: 10px;
+    }
+
+    .actionBtn {
+        margin: 15px;
+        padding:15px; 
+        background-color: red;
+        color: white;
+        border: 1px solid white;
+        border-radius: 10px;
+    }
+
+</style>
+"""
+
 def user_login(username, password):
     """
         User login functionality.
@@ -81,42 +111,42 @@ def get_todos():
 
     if st.session_state["USERTOKEN"] is not None:  # Check if USERTOKEN is not None
         headers = {"Authorization": f"Bearer {st.session_state["USERTOKEN"]}"}
-
         response = requests.get(f"{BASE_URL}/", headers=headers) 
 
         if response.status_code == 200: 
             todos = response.json()
 
-            # Show users table 
+            # Show todo table 
+            st.markdown(column_styles, unsafe_allow_html=True)
+
             colms = st.columns((1, 1, 1))
             fields = ["Title", "Description", "Action"]
+            
             for col, field_name in zip(colms, fields):
-                # header
-                col.write(field_name)
+                # Table Headers
+                col.markdown(f'<div class="column-style">{field_name}</div>', unsafe_allow_html=True)
+                col1, col2 = st.columns([2, 1])  # Adjust the ratio as needed
 
             for item in todos:
+                #  Table Data
                 col1, col2, col3 = st.columns((1, 1, 1 ))
-                col1.write(item["title"])  # title
-                col2.write(item["description"])  # description
-
-
-                button_type = "Delete"
-                
-                button_phold = col3.empty()  # create a placeholder
-
-                do_action = button_phold.button(button_type, key=item["id"])
+ 
+                col1.markdown(f'<div class="tabledata">{item["title"]}</div>', unsafe_allow_html=True)
+                col2.markdown(f'<div class="tabledata">{item["description"]}</div>', unsafe_allow_html=True)
                 
 
-                # Todo delete Endpoint
+                # # Delete button 
+                do_action = col3.button("Delete",key=item["id"])
+
                 if do_action:
-                        response = requests.delete(f"{BASE_URL}/delete/{item['id']}", headers=headers)
+                    # Delete Endpoint
+                    response = requests.delete(f"{BASE_URL}/delete/{item["id"]}", headers=headers)
+                    response.json()
 
-                        if response.status_code == 200:
-                            st.error(f"{item["title"]} deleted")
-                            button_phold.empty()  #  remove button
-
+                    if response.status_code == 200: 
+                        st.error(f"{item["title"]} deleted")
             return todos 
-        
+    
         elif response.status_code == 401:
             st.error("Unauthorized. Please log in.")
         else: 
@@ -163,6 +193,8 @@ def create_todo():
 
                 if response.status_code == 200:
                     st.success("Todo added successfully")
+                    st.session_state["globalTitle"] = None
+                    st.session_state["globalDescription"] = None
 
     st.session_state["df"] = get_todos() 
 
